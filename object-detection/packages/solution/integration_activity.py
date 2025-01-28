@@ -1,23 +1,19 @@
 from typing import Tuple
 
-
 def DT_TOKEN() -> str:
     # TODO: change this to your duckietown token
-    dt_token = "PUT_YOUR_TOKEN_HERE"
+    dt_token = "dt2-5wjpkjyNDVkVSh5zZ1XnnAg42GGDZT6Q4geKAbojv93wMifyxbnQ2733ourU9LSjhm7toTNp8wNuirMWc-43dzqWFnWd8KBa1yev1g3UKnzVxZkkTbfYatFU9CJ56JSqyGHEscjSZyxo2XfEPZUY"
     return dt_token
-
 
 def MODEL_NAME() -> str:
     # TODO: change this to your model's name that you used to upload it on google colab.
     # if you didn't change it, it should be "yolov5n"
     return "yolov5n"
 
-
 def NUMBER_FRAMES_SKIPPED() -> int:
     # TODO: change this number to drop more frames
     # (must be a positive integer)
     return 0
-
 
 def filter_by_classes(pred_class: int) -> bool:
     """
@@ -37,8 +33,7 @@ def filter_by_classes(pred_class: int) -> bool:
     # Right now, this returns True for every object's class
     # TODO: Change this to only return True for duckies!
     # In other words, returning False means that this prediction is ignored.
-    return True
-
+    return pred_class == 0
 
 def filter_by_scores(score: float) -> bool:
     """
@@ -48,8 +43,7 @@ def filter_by_scores(score: float) -> bool:
     # Right now, this returns True for every object's confidence
     # TODO: Change this to filter the scores, or not at all
     # (returning True for all of them might be the right thing to do!)
-    return True
-
+    return score >= 0.6
 
 def filter_by_bboxes(bbox: Tuple[int, int, int, int]) -> bool:
     """
@@ -58,4 +52,23 @@ def filter_by_bboxes(bbox: Tuple[int, int, int, int]) -> bool:
                 This means the shape of bbox is (leftmost x pixel, topmost y, rightmost x, bottommost y)
     """
     # TODO: Like in the other cases, return False if the bbox should not be considered.
-    return True
+    area_threshold = 10 # Porcentaje de area minimo para filtrar
+    widthb = bbox[2] - bbox[0]
+    hightb = bbox[3] - bbox[1]
+    areabb = widthb * hightb
+    width_img = 680
+    hight_img = 420
+    image_size = 416
+    # Porcentaje del area ocupada
+    #area_percentage = (areabb/ (image_size*image_size)) *100
+    area_percentage = (areabb/ (width_img*hight_img)) *100
+    # Proximidad al borde inferior
+    #is_near_bottom = bbox[0] > image_size*0.5 and bbox[1] < image_size*0.5
+    is_near_bottom = bbox[0] > width_img*0.5 and bbox[1] < width_img*0.5
+    # Filtro
+    #if area_percentage > 8:
+    #if is_near_bottom:
+    if areabb > 15000:
+        return True
+    else: 
+        return False
