@@ -21,7 +21,7 @@ To use these learning experiences do the following:
 We assume here that you have already set up your Duckietown development environment 
 following the steps in the 
 [Laptop setup](https://docs.duckietown.com/daffy/opmanual-duckiebot/setup/setup_laptop/index.html) and [Accounts setup](https://docs.duckietown.com/daffy/opmanual-duckiebot/setup/setup_account/index.html)
-sections of the of the Duckietown operation manual.
+sections of the Duckietown operation manual (`daffy`).
 
 <!--
 ```{todo}
@@ -46,7 +46,7 @@ Start by installing a new dependency,
 
 Then update your Duckietown shell and shell commands,
 
-    pip3 install -U duckietown-shell
+    pipx upgrade duckietown-shell
 
     dts update
 
@@ -66,6 +66,10 @@ fork: `<your_username>/duckietown-lx`
 Then clone your new repository, replacing your GitHub username in the command below,
 
     git clone -b mooc2022 git@github.com:<your_username>/duckietown-lx
+
+Now, change directory to `duckietown-lx`
+
+    cd duckietown-lx
 
 ## Step 4 - Set up the remote
 
@@ -98,7 +102,7 @@ work to the [challenges server](https://challenges.duckietown.org/) to evaluate 
 # Instructions
 
 **NOTE:** All commands below are intended to be executed from the root directory of a single exercise (e.g., the 
-`braitenberg` directory).
+`braitenberg` directory; you should run `cd braitenberg`).
 
 ## 1. Make sure your folder is up-to-date
 
