@@ -2,7 +2,7 @@ from typing import Tuple
 
 def DT_TOKEN() -> str:
     # TODO: change this to your duckietown token
-    dt_token = "dt2-5wjpkjyNDVkVSh5zZ1XnnAg42GGDZT6Q4geKAbojv93wMifyxbnQ2733ourU9LSjhm7toTNp8wNuirMWc-43dzqWFnWd8KBa1yev1g3UKnzVxZkkTbfYatFU9CJ56JSqyGHEscjSZyxo2XfEPZUY"
+    dt_token = "dt2-5wjpkjyNDVkVSh5zZ21kL9uYnYBdwqtLsh5pSWwC57otMzhyqz8ufWJxBghuaqCaiiRAmUvtieZ4JFd4Y-43dzqWFnWd8KBa1yev1g3UKnzVxZkkTbfciNzGkgYXCVa8PM737AxWAVanMrFHynTR"
     return dt_token
 
 def MODEL_NAME() -> str:
