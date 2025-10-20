@@ -35,60 +35,48 @@ def get_steer_matrix_right_lane_markings(img_shape: Tuple[int, int]) -> np.ndarr
 
     return steer_matrix
 
-import cv2
-import numpy as np
-
 def detect_lane_markings(image_bgr):
     """
-    Detecta las marcas de carril izquierdas (amarillas) y derechas (blancas) de una imagen BGR,
-    separando cada carril en su lado correspondiente de la imagen.
+    Detecta las marcas de carril basándose únicamente en la segmentación por color
+    y la posición espacial (izquierda/derecha).
 
     Args:
         image_bgr (np.ndarray): Imagen de entrada en el espacio de color BGR.
 
     Returns:
-        tuple: Máscaras binarias para las marcas de carril izquierdas (amarillas) y derechas (blancas).
+        tuple: Máscaras binarias para las marcas de carril izquierdas (amarillas) y derechas (blicas).
     """
     height, width, _ = image_bgr.shape
 
-    # Convertir la imagen al espacio de color HSV
+    # 1. Convertir la imagen al espacio de color HSV
+    # ¡AQUÍ ESTÁ LA CORRECCIÓN!
     imghsv = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2HSV)
 
-    # --- Límites de color y máscara de horizonte (sin cambios) ---
+    # 2. Definir rangos de color y crear máscaras
     white_lower_hsv = np.array([0, 0, 150])
     white_upper_hsv = np.array([179, 50, 255])
     yellow_lower_hsv = np.array([20, 100, 100])
     yellow_upper_hsv = np.array([30, 255, 255])
-    mask_white = cv2.inRange(imghsv, white_lower_hsv, white_upper_hsv)
-    mask_yellow = cv2.inRange(imghsv, yellow_lower_hsv, yellow_upper_hsv)
-    mask_ground = np.zeros_like(mask_white)
+
+    mask_white_full = cv2.inRange(imghsv, white_lower_hsv, white_upper_hsv)
+    mask_yellow_full = cv2.inRange(imghsv, yellow_lower_hsv, yellow_upper_hsv)
+
+    # 3. Crear máscara para eliminar el horizonte
+    mask_ground = np.zeros_like(mask_white_full)
     mask_ground[180:, :] = 255
-    mask_white = cv2.bitwise_and(mask_white, mask_ground)
-    mask_yellow = cv2.bitwise_and(mask_yellow, mask_ground)
 
-    # --- Detección de bordes (sin cambios) ---
-    img_gray = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2GRAY)
-    img_gray_masked = cv2.bitwise_and(img_gray, img_gray, mask=mask_ground)
-    sobel_y = cv2.Sobel(img_gray_masked, cv2.CV_64F, 0, 1, ksize=5)
-    abs_sobel_y = np.absolute(sobel_y)
-    sobel_edges = np.uint8(255 * abs_sobel_y / np.max(abs_sobel_y))
-    combined_mask_white = cv2.bitwise_and(mask_white, sobel_edges)
-    combined_mask_yellow = cv2.bitwise_and(mask_yellow, sobel_edges)
-
-    # --- ¡NUEVO! Máscaras para dividir la imagen en mitades ---
-    # Se crea una máscara negra del mismo tamaño que la imagen
-    mask_left_half = np.zeros_like(combined_mask_yellow)
-    mask_right_half = np.zeros_like(combined_mask_white)
-
-    # Se rellena de blanco solo la mitad izquierda para la máscara amarilla
+    # 4. Crear máscaras para dividir la imagen en mitades
+    mask_left_half = np.zeros_like(mask_white_full)
     cv2.rectangle(mask_left_half, (0, 0), (width // 2, height), 255, -1)
-    # Se rellena de blanco solo la mitad derecha para la máscara blanca
+    mask_right_half = np.zeros_like(mask_white_full)
     cv2.rectangle(mask_right_half, (width // 2, 0), (width, height), 255, -1)
 
+    # 5. Combinar las máscaras para obtener el resultado final
+    final_mask_yellow = cv2.bitwise_and(mask_yellow_full, mask_ground)
+    final_mask_yellow = cv2.bitwise_and(final_mask_yellow, mask_left_half)
 
-    # Aplicar las máscaras de mitad a cada detección de color
-    final_mask_yellow = cv2.bitwise_and(combined_mask_yellow, mask_left_half)
-    final_mask_white = cv2.bitwise_and(combined_mask_white, mask_right_half)
+    final_mask_white = cv2.bitwise_and(mask_white_full, mask_ground)
+    final_mask_white = cv2.bitwise_and(final_mask_white, mask_right_half)
 
     return final_mask_yellow, final_mask_white
 
